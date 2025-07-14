@@ -1,6 +1,6 @@
 # Internship Notes
 
-## Day 1 - 🐘 Basic SQL Practice: CUSTOMERS Table
+## Day 1 -  Basic SQL Practice: CUSTOMERS Table
 
 A beginner-friendly summary of the SQL commands I practiced using a simple `CUSTOMERS` table. Includes table creation, inserting data, querying, updating, deleting, filtering, and more.
 
@@ -89,3 +89,77 @@ SELECT AGE, AVG(SALARY) AS AverageSalary FROM CUSTOMERS GROUP BY AGE;
 ALTER TABLE CUSTOMERS ADD EMAIL VARCHAR(50);
 
 ---
+## Day 1 Part 2 -  Basic SQL Practice: Orders Table
+
+### Creating Table
+CREATE TABLE ORDERS (
+    ORDER_ID INT IDENTITY(1,1) PRIMARY KEY,
+    CUSTOMER_ID INT,
+    PRODUCT VARCHAR(50),
+    AMOUNT DECIMAL(10,2),
+    ORDER_DATE DATE,
+    FOREIGN KEY (CUSTOMER_ID) REFERENCES CUSTOMERS(ID) );
+
+### Inserting Data
+INSERT INTO ORDERS (CUSTOMER_ID, PRODUCT, AMOUNT, ORDER_DATE) VALUES
+(1, 'Laptop', 1200.00, '2025-07-14'),
+(2, 'Wireless Mouse', 25.00, '2025-07-14'),
+(2, 'USB-C Hub', 45.00, '2025-07-15'),
+(3, 'Noise Cancelling Headphones', 200.00, '2025-07-14'),
+(3, 'External SSD', 150.00, '2025-07-16'),
+(4, 'Monitor', 300.00, '2025-07-14'),
+(5, 'Keyboard', 120.00, '2025-07-14'),
+(5, 'Gaming Keyboard', 130.00, '2025-07-14'),
+(5, 'Webcam', 80.00, '2025-07-16'),
+(6, 'Smart Watch', 180.00, '2025-07-15'),
+(6, 'Bluetooth Speaker', 60.00, '2025-07-16');
+
+### Joining Tables 
+SELECT O.ORDER_ID, C.NAME AS CustomerName, O.PRODUCT, O.AMOUNT, O.ORDER_DATE
+FROM ORDERS O
+JOIN CUSTOMERS C ON O.CUSTOMER_ID = C.ID;
+
+### Aggregating Data
+SELECT 
+    C.NAME AS CustomerName,
+    COUNT(O.ORDER_ID) AS NumberOfOrders,
+    SUM(O.AMOUNT) AS TotalOrderedAmount
+FROM CUSTOMERS C
+LEFT JOIN ORDERS O ON C.ID = O.CUSTOMER_ID
+GROUP BY C.NAME
+ORDER BY TotalOrderedAmount DESC;
+
+### Creating a View
+CREATE VIEW CustomerOrders AS
+SELECT
+    C.NAME,
+    O.PRODUCT,
+    O.ORDER_DATE
+FROM CUSTOMERS C
+JOIN ORDERS O ON C.ID = O.CUSTOMER_ID;
+**Using the View**
+SELECT * FROM CustomerOrders;
+
+#### Creating a Filtered Unique Index 
+CREATE UNIQUE INDEX UC_Email_NotNull
+ON CUSTOMERS (EMAIL)
+WHERE EMAIL IS NOT NULL;
+
+### Creating a Trigger to Log New 
+**Step 1: Create the logging table**
+CREATE TABLE ORDER_LOG (
+    LOG_ID INT IDENTITY(1,1) PRIMARY KEY,
+    ORDER_ID INT,
+    MESSAGE VARCHAR(100),
+    CREATED_AT DATETIME DEFAULT GETDATE()
+
+**Step 2: Create the trigger**
+CREATE TRIGGER LogNewOrder
+ON ORDERS
+AFTER INSERT
+AS
+BEGIN
+    INSERT INTO ORDER_LOG (ORDER_ID, MESSAGE)
+    SELECT ORDER_ID, 'New order inserted'
+    FROM inserted;
+END;
