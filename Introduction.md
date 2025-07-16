@@ -380,5 +380,6 @@ FROM INFORMATION_SCHEMA.VIEWS;
 ```sql
 EXEC sp_rename 'CLIENTS_VIEW', 'VIEW_CLIENTS';
 ```
+## Day 3 Part 2 - Basic SQL Practice #2
 
 
