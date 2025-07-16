@@ -362,3 +362,20 @@ FROM CLIENTS
 WHERE AGE >= 25
 WITH CHECK OPTION;
 ```
+## Managing Views
+**Drop views if they exist before recreating or deleting:**
+```sql
+IF OBJECT_ID('CLIENTS_VIEW1', 'V') IS NOT NULL
+    DROP VIEW CLIENTS_VIEW1;
+
+IF OBJECT_ID('CLIENTS_VIEW2', 'V') IS NOT NULL
+    DROP VIEW CLIENTS_VIEW2;
+```
+**List all views in the database:**
+```sql
+SELECT TABLE_SCHEMA, TABLE_NAME
+FROM INFORMATION_SCHEMA.VIEWS;
+```
+
+
+
