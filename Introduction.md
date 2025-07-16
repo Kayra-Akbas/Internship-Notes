@@ -176,3 +176,84 @@ END;
 ```
 ## Day 2 -  Basic SQL Practices #2:
 A summary of the SQL commands I practiced using a simple CLIENTS table. Includes table creation, inserting data, selecting, querying, updating, deleting, filtering, and more.
+
+## Creating Table
+```sql
+CREATE TABLE CLIENTS (
+    ID INT NOT NULL,
+    NAME VARCHAR(20) NOT NULL,
+    AGE INT NOT NULL,
+    ADDRESS CHAR(25),
+    SALARY DECIMAL(18, 2),
+    PRIMARY KEY (ID)
+);
+```
+## Inserting Data
+```sql
+INSERT INTO CLIENTS (ID, NAME, AGE, ADDRESS, SALARY) VALUES
+(1, 'Ramesh', 32, 'Ahmedabad', 2000.00),
+(2, 'Khilan', 25, 'Delhi', 1500.00),
+(3, 'Kaushik', 23, 'Kota', 2000.00),
+(4, 'Chaitali', 25, 'Mumbai', 6500.00),
+(5, 'Hardik', 27, 'Bhopal', 8500.00),
+(6, 'Komal', 22, 'Hyderabad', 4500.00),
+(7, 'Muffy', 24, 'Indore', 10000.00);
+```
+## Selecting Data
+**Select all columns and rows**
+```sql
+SELECT * FROM CLIENTS;
+```
+**Select specific columns**
+```sql
+ SELECT ID, NAME, SALARY FROM CLIENTS;
+```
+**Select with concatenated columns and ordering**
+```sql
+SELECT CONCAT(NAME, ' ', AGE) AS DETAILS, ADDRESS
+FROM CLIENTS
+ORDER BY NAME;
+```
+**Creating Backup Table with SELECT INTO**
+```sql
+SELECT * INTO CLIENT_BACKUP FROM CLIENTS;
+```
+**Creating Filtered Table (Names Starting with 'K' or 'k')**
+```sql
+SELECT * INTO NameStartsWith_K
+FROM CLIENTS
+WHERE NAME LIKE 'k%' OR NAME LIKE 'K%';
+```
+## Updating Data
+**Update address of a client by ID**
+```sql
+UPDATE CLIENTS
+SET ADDRESS = 'Pune'
+WHERE ID = 6;
+```
+**Update multiple columns for a client by name**
+```sql
+UPDATE CLIENTS
+SET ADDRESS = 'Pune', SALARY = 1000.00
+WHERE NAME = 'Ramesh';
+```
+**Increment age and salary for all clients**
+```sql
+UPDATE CLIENTS
+SET AGE = AGE + 5,
+    SALARY = SALARY + 3000;
+```
+## Deleting Data
+**Delete a client by ID**
+```sql
+DELETE FROM CLIENTS WHERE ID = 6;
+```
+**Delete clients older than 25**
+```sql
+DELETE FROM CLIENTS WHERE AGE > 25;
+```
+
+
+
+
+
