@@ -174,3 +174,4 @@ BEGIN
     FROM inserted;
 END;
 ```
+## Day 2 -  Basic SQL Practices:
