@@ -174,4 +174,5 @@ BEGIN
     FROM inserted;
 END;
 ```
-## Day 2 -  Basic SQL Practices:
+## Day 2 -  Basic SQL Practices #2:
+A summary of the SQL commands I practiced using a simple CLIENTS table. Includes table creation, inserting data, selecting, querying, updating, deleting, filtering, and more.
