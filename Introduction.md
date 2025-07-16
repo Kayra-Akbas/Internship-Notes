@@ -304,3 +304,61 @@ WHERE C.SALARY > 2000;
 DELETE FROM CLIENTS WHERE SALARY > 2000;
 ```
 Day 2 Part 2 - Basic SQL Practice #2 
+## Creating Views for the CLIENTS Table
+```sql
+CREATE VIEW CLIENTS_VIEW1 AS
+SELECT * FROM CLIENTS;
+
+CREATE VIEW CLIENTS_VIEW2 AS
+SELECT * FROM CLIENTS;
+
+CREATE VIEW CLIENTS_VIEW3 AS
+SELECT * FROM CLIENTS;
+```
+
+## Updating Records via Views
+**Update the age of client named 'Ramesh':**
+```sql
+UPDATE CLIENTS_VIEW
+SET AGE = 35
+WHERE NAME = 'Ramesh';
+```
+**Change address of client with ID = 6:**
+```sql
+UPDATE CLIENTS_VIEW
+SET ADDRESS = 'Pune'
+WHERE ID = 6;
+```
+**Update name and age for client with ID = 3:**
+```sql
+UPDATE CLIENTS_VIEW
+SET NAME = 'Kaushik Ramanujan', AGE = 24
+WHERE ID = 3;
+```
+**Increase age for all clients by 6:**
+```sql
+UPDATE CLIENTS_VIEW
+SET AGE = AGE + 6;
+```
+## Deleting Records via Views
+**Delete clients where age is 22:**
+```sql
+DELETE FROM CLIENTS_VIEW3
+WHERE AGE = 22;
+```
+## Creating Filtered Views
+**View only clients with salary greater than 3000:**
+```sql
+CREATE VIEW BUYERS_VIEW AS
+SELECT * FROM CLIENTS
+WHERE SALARY > 3000;
+```
+**View only clients aged 25 or older with update/insert restrictions:**
+```sql
+CREATE VIEW BUYE
+CREATE VIEW MY_VIEW AS
+SELECT NAME, AGE
+FROM CLIENTS
+WHERE AGE >= 25
+WITH CHECK OPTION;
+```
