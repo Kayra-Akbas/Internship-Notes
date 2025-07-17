@@ -507,5 +507,60 @@ SELECT * FROM CUSTOMERS WHERE EXISTS (
    SELECT CUSTOMER_ID FROM ORDERS WHERE ORDERS.CUSTOMER_ID = CUSTOMERS.ID
 );
 ```
-**
-##
+**Select customers with no orders:**
+```sql
+SELECT * FROM CUSTOMERS WHERE NOT EXISTS (
+   SELECT CUSTOMER_ID FROM ORDERS WHERE ORDERS.CUSTOMER_ID = CUSTOMERS.ID
+);
+```
+## Aggregate Queries with GROUP BY and HAVING
+**Count customers by age excluding age 22:**
+```sql
+SELECT COUNT(ID) AS CustomerCount, AGE FROM CUSTOMERS
+WHERE AGE <> 22
+GROUP BY AGE;
+```
+**Average salary by address, filtering addresses with average salary > 5240:**
+```sql
+SELECT ADDRESS, AVG(SALARY) AS AVG_SALARY FROM CUSTOMERS
+GROUP BY ADDRESS
+HAVING AVG(SALARY) > 5240;
+```
+## Conditional Logic with CASE
+**Assign salary based on age using CASE in UPDATE:**
+```sql
+UPDATE CUSTOMERS
+SET SALARY = CASE AGE
+    WHEN 25 THEN 17000
+    WHEN 32 THEN 25000
+    ELSE 12000
+END;
+```
+## Classify customers into salary groups and sum total salary: 
+```sql
+SELECT
+   CASE 
+      WHEN SALARY <= 4000 THEN 'Lowest paid'
+      WHEN SALARY > 4000 AND SALARY <= 6500 THEN 'Average paid'
+      ELSE 'Highest paid'
+   END AS SALARY_STATUS,
+   SUM(SALARY) AS Total
+FROM CUSTOMERS
+GROUP BY 
+   CASE 
+      WHEN SALARY <= 4000 THEN 'Lowest paid'
+      WHEN SALARY > 4000 AND SALARY <= 6500 THEN 'Average paid'
+      ELSE 'Highest paid'
+   END;
+```
+**Assign designations based on age:**
+```sql
+SELECT NAME, ADDRESS,
+   CASE
+      WHEN AGE < 25 THEN 'Intern'
+      WHEN AGE >= 25 AND AGE <= 27 THEN 'Associate Engineer'
+      ELSE 'Senior Developer'
+   END AS Designation
+FROM CUSTOMERS
+WHERE SALARY >= 2000;
+```
