@@ -380,6 +380,46 @@ FROM INFORMATION_SCHEMA.VIEWS;
 ```sql
 EXEC sp_rename 'CLIENTS_VIEW', 'VIEW_CLIENTS';
 ```
-## Day 4  - Basic SQL Practice #3
+## Day 3  - Basic SQL Practice #3: Working with the CARS Table
+
+## Table Creation
+```sql
+CREATE TABLE CARS (
+   ID INT NOT NULL,
+   Name VARCHAR(150),
+   IsRed BIT
+);
+```
+## Inserting Sample Data
+```sql
+INSERT INTO CARS (ID, Name, IsRed) VALUES (1, 'Toyota Corolla', 1);
+INSERT INTO CARS (ID, Name, IsRed) VALUES (2, 'Honda Civic', 0);
+INSERT INTO CARS (ID, Name, IsRed) VALUES (3, 'Ford Mustang', 1);
+```
+## Querying Data
+**Select All Cars**
+```sql
+SELECT * FROM CARS;
+```
+**Select Only Red Cars**
+```sql
+SELECT * FROM CARS WHERE IsRed = 1;
+```
+## Trouble Shooting
+**Message**
+```sql
+(0 rows affected)
+```
+**Cause: The query condition did not match any data in the table.**
+## How To Fix
+**Check what data exists**
+```sql
+SELECT * FROM CARS;
+```
+**If table is empty or has no red cars, insert some using:**
+```sql
+INSERT INTO CARS (ID, Name, IsRed) VALUES (4, 'Chevy Camaro', 1);
+```
+
 
 
