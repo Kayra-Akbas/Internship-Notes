@@ -420,6 +420,92 @@ SELECT * FROM CARS;
 ```sql
 INSERT INTO CARS (ID, Name, IsRed) VALUES (4, 'Chevy Camaro', 1);
 ```
-
-
-
+## Day 3 Part 2 - Basic SQL Practice #4 
+##  Creating the CUSTOMERS Table
+```sql
+CREATE TABLE CUSTOMERS (
+   ID INT NOT NULL,
+   NAME VARCHAR(20) NOT NULL,
+   AGE INT NOT NULL,
+   ADDRESS CHAR(25),
+   SALARY DECIMAL(18, 2),
+   PRIMARY KEY (ID)
+);
+```
+##  Inserting Data into CUSTOMERS
+```sql
+INSERT INTO CUSTOMERS VALUES
+(1, 'Ramesh', 32, 'Ahmedabad', 2000.00),
+(2, 'Khilan', 25, 'Delhi', 1500.00),
+(3, 'Kaushik', 23, 'Kota', 2000.00),
+(4, 'Chaitali', 25, 'Mumbai', 6500.00),
+(5, 'Hardik', 27, 'Bhopal', 8500.00),
+(6, 'Komal', 22, 'Hyderabad', 4500.00),
+(7, 'Muffy', 24, 'Indore', 10000.00);
+```
+## Basic SELECT Queries
+**Select customers with salary greater than 2000:**
+```sql
+SELECT ID, NAME, SALARY FROM CUSTOMERS WHERE SALARY > 2000;
+```
+**Select customers by multiple names:**
+```sql
+SELECT * FROM CUSTOMERS WHERE NAME IN ('Khilan', 'Hardik', 'Muffy');
+```
+**Select customers where name starts with 'k':**
+```sql
+SELECT * FROM CUSTOMERS WHERE NAME LIKE 'k%';
+```
+## Updating Records
+**Increase salary of 'Ramesh' by 10,000:**
+```sql
+UPDATE CUSTOMERS SET SALARY = SALARY + 10000 WHERE NAME = 'Ramesh';
+```
+**Update age to 48 where age is NULL:**
+```sql
+UPDATE CUSTOMERS SET AGE = 48 WHERE AGE IS NULL;
+```
+**Increase salary by 5,000 where salary is not NULL:**
+```sql
+UPDATE CUSTOMERS SET SALARY = SALARY + 5000 WHERE SALARY IS NOT NULL;
+```
+**Conditional update of salary based on age:**
+```sql
+UPDATE CUSTOMERS
+SET SALARY = CASE AGE
+    WHEN 25 THEN 17000
+    WHEN 32 THEN 25000
+    ELSE 12000
+END;
+```
+## Deleting Records
+**Delete customers with age 25 or salary less than 2000:**
+```sql
+DELETE FROM CUSTOMERS WHERE AGE = 25 OR SALARY < 2000;
+```
+**Creating the ORDERS Table**
+```sql
+CREATE TABLE ORDERS (
+   OID INT NOT NULL,
+   DATE VARCHAR(20) NOT NULL,
+   CUSTOMER_ID INT NOT NULL,
+   AMOUNT DECIMAL(18, 2)
+);
+```
+## Inserting Data into ORDERS
+```sql
+INSERT INTO ORDERS VALUES
+(102, '2009-10-08 00:00:00', 3, 3000.00),
+(100, '2009-10-08 00:00:00', 3, 1500.00),
+(101, '2009-11-20 00:00:00', 2, 1560.00),
+(103, '2008-05-20 00:00:00', 4, 2060.00)
+```
+## Using EXISTS and NOT EXISTS
+**Select customers who have placed orders**
+```sql
+SELECT * FROM CUSTOMERS WHERE EXISTS (
+   SELECT CUSTOMER_ID FROM ORDERS WHERE ORDERS.CUSTOMER_ID = CUSTOMERS.ID
+);
+```
+**
+##
