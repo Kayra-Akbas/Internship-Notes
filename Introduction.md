@@ -564,3 +564,105 @@ SELECT NAME, ADDRESS,
 FROM CUSTOMERS
 WHERE SALARY >= 2000;
 ```
+## Day 3 Part 3 - SQL Practice Summary
+
+## Creating the COURSES_PICKED Table
+```sql
+CREATE TABLE COURSES_PICKED(
+   STUDENT_ID INT NOT NULL, 
+   STUDENT_NAME VARCHAR(30) NOT NULL, 
+   COURSE_NAME VARCHAR(30) NOT NULL
+);
+```
+## Inserting Data into COURSES_PICKED
+```sql
+INSERT INTO COURSES_PICKED VALUES
+(1, 'JOHN', 'ENGLISH'),
+(2, 'ROBERT', 'COMPUTER SCIENCE'),
+(3, 'SASHA', 'COMMUNICATIONS'),
+(4, 'JULIAN', 'MATHEMATICS');
+```
+## Creating the EXTRA_COURSES_PICKED Table
+```sql
+CREATE TABLE EXTRA_COURSES_PICKED(
+   STUDENT_ID INT NOT NULL, 
+   STUDENT_NAME VARCHAR(30) NOT NULL, 
+   COURSE_NAME VARCHAR(30) NOT NULL
+);
+```
+## Inserting Data into EXTRA_COURSES_PICKED
+```sql
+(1, 'JOHN', 'PHYSICAL EDUCATION'),
+(2, 'ROBERT', 'GYM'),
+(3, 'SASHA', 'FILM'),
+(4, 'JULIAN', 'MATHEMATICS');
+```
+## Combining Course Records Using UNION
+```sql
+SELECT * FROM COURSES_PICKED
+UNION
+SELECT * FROM EXTRA_COURSES_PICKED;
+```
+## Creating the STUDENTS Table
+```sql
+CREATE TABLE STUDENTS(
+   ID INT NOT NULL, 
+   NAME VARCHAR(20) NOT NULL, 
+   SUBJECT VARCHAR(20) NOT NULL, 
+   AGE INT NOT NULL, 
+   HOBBY VARCHAR(20) NOT NULL, 
+   PRIMARY KEY(ID));
+```
+## Inserting Data into STUDENTS
+```sql
+INSERT INTO STUDENTS VALUES
+(1, 'Naina', 'Maths', 24, 'Cricket'),
+(2, 'Varun', 'Physics', 26, 'Football'),
+(3, 'Dev', 'Maths', 23, 'Cricket'),
+(4, 'Priya', 'Physics', 25, 'Cricket'),
+(5, 'Aditya', 'Chemistry', 21, 'Cricket'),
+(6, 'Kalyan', 'Maths', 30, 'Football');
+```
+## Creating the STUDENTS_HOBBY Table
+```sql
+CREATE TABLE STUDENTS_HOBBY(
+   ID INT NOT NULL, 
+   NAME VARCHAR(20) NOT NULL, 
+   HOBBY VARCHAR(20) NOT NULL, 
+   AGE INT NOT NULL, 
+   PRIMARY KEY(ID)
+);
+```
+## Copying Hobby Data from STUDENTS to STUDENTS_HOBBY
+```sql
+INSERT INTO STUDENTS_HOBBY (ID, NAME, HOBBY, AGE)
+SELECT ID, NAME, HOBBY, AGE FROM STUDENTS;
+```
+## Using INTERSECT to Find Matching Records
+```sql
+SELECT NAME, AGE, HOBBY FROM STUDENTS_HOBBY
+INTERSECT
+SELECT NAME, AGE, HOBBY FROM STUDENTS;
+```
+## Using EXCEPT to Find Differences
+```sql
+SELECT NAME, HOBBY, AGE FROM STUDENTS
+WHERE HOBBY IN ('Cricket')
+EXCEPT
+SELECT NAME, HOBBY, AGE FROM STUDENTS_HOBBY
+WHERE HOBBY IN ('Cricket');
+```
+## Self-Join to Compare Customer Salaries
+```sql
+SELECT 
+   a.ID, 
+   b.NAME AS EARNS_HIGHER, 
+   a.NAME AS EARNS_LESS, 
+   a.SALARY AS LOWER_SALARY
+FROM CUSTOMERS a
+JOIN CUSTOMERS b ON a.SALARY < b.SALARY
+ORDER BY a.ID;
+```
+
+
+
