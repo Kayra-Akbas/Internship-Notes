@@ -663,7 +663,7 @@ FROM CUSTOMERS a
 JOIN CUSTOMERS b ON a.SALARY < b.SALARY
 ORDER BY a.ID;
 ```
-## Day 4 - Basic SQL Practice 
+## Day 4 - Basic SQL Practice #5
 
 
 
