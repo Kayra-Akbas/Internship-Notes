@@ -663,7 +663,46 @@ FROM CUSTOMERS a
 JOIN CUSTOMERS b ON a.SALARY < b.SALARY
 ORDER BY a.ID;
 ```
-## Day 4 - Basic SQL Practice #5
+## Day 4 SQL Set Operations: INTERSECT and EXCEPT
 
+### INTERSECT - Return Common Records in Both Tables
 
-
+**Find students who like 'Cricket' in both STUDENTS and STUDENTS_HOBBY:**
+```sql
+SELECT NAME, AGE, HOBBY FROM STUDENTS_HOBBY
+WHERE HOBBY IN ('Cricket')
+INTERSECT
+SELECT NAME, AGE, HOBBY FROM STUDENTS
+WHERE HOBBY IN ('Cricket');
+```
+**Find students whose names start with 'v' and exist in both STUDENTS and STUDENTS_HOBBY:**
+```sql
+SELECT NAME, AGE, HOBBY FROM STUDENTS_HOBBY
+WHERE NAME LIKE 'v%'
+INTERSECT
+SELECT NAME, AGE, HOBBY FROM STUDENTS
+WHERE NAME LIKE 'v%';
+```
+## EXCEPT - Return Records in One Table But Not in the Other
+**Students who are in STUDENTS but not in STUDENTS_HOBBY:**
+```sql
+SELECT NAME, HOBBY, AGE FROM STUDENTS
+EXCEPT 	
+SELECT NAME, HOBBY, AGE FROM STUDENTS_HOBBY;
+```
+**Students who like 'Cricket' only in STUDENTS (not in STUDENTS_HOBBY):**
+```sql
+SELECT NAME, HOBBY, AGE FROM STUDENTS
+WHERE HOBBY IN ('Cricket')
+EXCEPT
+SELECT NAME, HOBBY, AGE FROM STUDENTS_HOBBY
+WHERE HOBBY IN ('Cricket');
+```
+**Students with hobbies starting with 'F' in STUDENTS but not in STUDENTS_HOBBY:**
+```sql
+SELECT ID, NAME, HOBBY, AGE FROM STUDENTS
+WHERE HOBBY LIKE 'F%'
+EXCEPT
+SELECT ID, NAME, HOBBY, AGE FROM STUDENTS_HOBBY
+WHERE HOBBY LIKE 'F%';
+```
