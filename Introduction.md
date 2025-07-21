@@ -743,3 +743,35 @@ CREATE TABLE ORDER_RANGE (
    ORDER_RANGE VARCHAR(20) NOT NULL
 );
 ```
+## Inserting Sample Data
+```sql
+INSERT INTO CUSTOMERS VALUES
+(1, 'Ramesh', 32, 'Ahmedabad', 2000.00),
+(2, 'Khilan', 25, 'Delhi', 1500.00),
+(3, 'Kaushik', 23, 'Kota', 2000.00);
+
+INSERT INTO ORDERS VALUES
+(101, '2025-07-20', 1, 3000.00),
+(102, '2025-07-21', 2, 1500.00);
+
+INSERT INTO EMPLOYEE VALUES
+(100, 'ALEKHYA', 3623),
+(101, 'REVATHI', 1291);
+
+INSERT INTO ORDER_RANGE VALUES
+(1, '1-100'),
+(2, '100-200'),
+(3, '200-300');
+```
+## INNER JOIN - Retrieve Customers with Their Orders
+```sql
+SELECT ID, NAME, AMOUNT, DATE
+FROM CUSTOMERS
+INNER JOIN ORDERS ON CUSTOMERS.ID = ORDERS.CUSTOMER_ID;
+```
+## LEFT JOIN - All Customers with Orders (including customers without orders)
+```sql
+SELECT ID, NAME, AMOUNT, DATE
+FROM CUSTOMERS
+LEFT JOIN ORDERS ON CUSTOMERS.ID = ORDERS.CUSTOMER_ID;
+```
