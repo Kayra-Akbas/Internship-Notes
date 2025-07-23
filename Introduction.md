@@ -930,4 +930,12 @@ FROM Album
 JOIN Artist ON Album.ArtistId = Artist.ArtistId
 WHERE Artist.Name = 'AC/DC';
 ```
-## 
+##  How Many Tracks in Each Genre?
+```sql
+SELECT Genre.Name, COUNT(*) AS TrackCount
+FROM Track
+JOIN Genre ON Track.GenreId = Genre.GenreId
+GROUP BY Genre.Name
+ORDER BY TrackCount DESC;
+```
+
