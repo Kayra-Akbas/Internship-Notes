@@ -913,4 +913,21 @@ ORDER BY TotalSales DESC;
 SELECT FirstName, LastName, Title
 FROM Employee;
 ```
-
+## Tracks in a Specific Playlist (e.g., "Music")
+```sql
+SELECT 
+    Playlist.Name AS PlaylistName,
+    Track.Name AS TrackName
+FROM Playlist
+JOIN PlaylistTrack ON Playlist.PlaylistId = PlaylistTrack.PlaylistId
+JOIN Track ON PlaylistTrack.TrackId = Track.TrackId
+WHERE Playlist.Name = 'Music';
+```
+## Find All Albums by “AC/DC”
+```sql
+SELECT Album.Title
+FROM Album
+JOIN Artist ON Album.ArtistId = Artist.ArtistId
+WHERE Artist.Name = 'AC/DC';
+```
+## 
