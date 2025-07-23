@@ -938,4 +938,44 @@ JOIN Genre ON Track.GenreId = Genre.GenreId
 GROUP BY Genre.Name
 ORDER BY TrackCount DESC;
 ```
-
+## Top 5 Customers by Total Purchase Amount
+```sql
+SELECT 
+    Customer.CustomerId,
+    Customer.FirstName + ' ' + Customer.LastName AS FullName,
+    SUM(Invoice.Total) AS TotalSpent
+FROM Invoice
+JOIN Customer ON Invoice.CustomerId = Customer.CustomerId
+GROUP BY Customer.CustomerId, Customer.FirstName, Customer.LastName
+ORDER BY TotalSpent DESC
+OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY;
+```
+##  Most Popular Genre (By Track Count Sold)
+```sql
+SELECT 
+    Genre.Name AS Genre,
+    COUNT(*) AS TracksSold
+FROM InvoiceLine
+JOIN Track ON InvoiceLine.TrackId = Track.TrackId
+JOIN Genre ON Track.GenreId = Genre.GenreId
+GROUP BY Genre.Name
+ORDER BY TracksSold DESC;
+```
+## Monthly Sales Report (Invoice Totals by Month)
+```sql
+SELECT 
+    FORMAT(InvoiceDate, 'yyyy-MM') AS Month,
+    SUM(Total) AS MonthlySales
+FROM Invoice
+GROUP BY FORMAT(InvoiceDate, 'yyyy-MM')
+ORDER BY Month;
+```
+##  List All Employees and Their Customers
+```sql
+SELECT 
+    e.FirstName + ' ' + e.LastName AS EmployeeName,
+    c.FirstName + ' ' + c.LastName AS CustomerName
+FROM Employee e
+JOIN Customer c ON e.EmployeeId = c.SupportRepId
+ORDER BY e.LastName, c.LastName;
+```
