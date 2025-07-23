@@ -1020,3 +1020,27 @@ JOIN InvoiceLine ON Invoice.InvoiceId = InvoiceLine.InvoiceId
 GROUP BY Invoice.InvoiceId
 ORDER BY Total DESC;
 ```
+## Which Media Type Sells the Most Tracks?
+```sql
+SELECT 
+    MediaType.Name AS Format,
+    COUNT(*) AS TracksSold
+FROM InvoiceLine
+JOIN Track ON InvoiceLine.TrackId = Track.TrackId
+JOIN MediaType ON Track.MediaTypeId = MediaType.MediaTypeId
+GROUP BY MediaType.Name
+ORDER BY TracksSold DESC;
+```
+##  Average Spending Per Country
+```sql
+SELECT 
+    BillingCountry,
+    COUNT(DISTINCT CustomerId) AS Customers,
+    SUM(Total) AS TotalSpent,
+    AVG(Total) AS AvgInvoice,
+    SUM(Total) / COUNT(DISTINCT CustomerId) AS AvgSpentPerCustomer
+FROM Invoice
+GROUP BY BillingCountry
+ORDER BY TotalSpent DESC;
+```
+
