@@ -1174,3 +1174,16 @@ FROM Customer c
 LEFT JOIN Invoice i ON c.CustomerId = i.CustomerId
 WHERE i.InvoiceId IS NULL;
 ```
+##  Tracks From Albums with Short Titles (< 20 chars) AND Metal Genre
+```sql
+ELECT 
+    t.TrackId,
+    t.Name AS TrackName,
+    a.Title AS AlbumTitle,
+    g.Name AS Genre
+FROM Track t
+JOIN Album a ON t.AlbumId = a.AlbumId
+JOIN Genre g ON t.GenreId = g.GenreId
+WHERE LEN(a.Title) < 20
+  AND g.Name = 'Metal';
+```
