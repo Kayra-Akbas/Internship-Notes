@@ -1154,4 +1154,23 @@ JOIN Album ON Track.AlbumId = Album.AlbumId
 JOIN Artist ON Album.ArtistId = Artist.ArtistId
 WHERE Genre.Name = 'Grunge';
 ```
-## 
+##  RIGHT JOIN – Invoices Without a Matching Customer
+```sql
+SELECT 
+    c.CustomerId,
+    i.InvoiceId,
+    i.Total
+FROM Customer c
+RIGHT JOIN Invoice i ON c.CustomerId = i.CustomerId
+WHERE c.CustomerId IS NULL;
+```
+## LEFT JOIN – Customers Without Invoices
+```sql
+SELECT 
+    c.CustomerId,
+    c.FirstName + ' ' + c.LastName AS CustomerName,
+    i.InvoiceId
+FROM Customer c
+LEFT JOIN Invoice i ON c.CustomerId = i.CustomerId
+WHERE i.InvoiceId IS NULL;
+```
