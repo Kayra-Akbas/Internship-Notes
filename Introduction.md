@@ -1043,4 +1043,95 @@ FROM Invoice
 GROUP BY BillingCountry
 ORDER BY TotalSpent DESC;
 ```
+## Full Invoice Details for One Invoice
+```sql
+SELECT 
+    i.InvoiceId,
+    i.InvoiceDate,
+    c.FirstName + ' ' + c.LastName AS CustomerName,
+    t.Name AS TrackName,
+    il.UnitPrice,
+    il.Quantity,
+    (il.UnitPrice * il.Quantity) AS LineTotal
+FROM Invoice i
+JOIN Customer c ON i.CustomerId = c.CustomerId
+JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+JOIN Track t ON il.TrackId = t.TrackId
+WHERE i.InvoiceId = 1;
+```
+## Average Purchase Frequency per Customer
+```sql
+WITH PurchaseIntervals AS (
+    SELECT 
+        CustomerId,
+        InvoiceDate,
+        LAG(InvoiceDate) OVER (PARTITION BY CustomerId ORDER BY InvoiceDate) AS PreviousInvoiceDate
+    FROM Invoice
+)
 
+SELECT 
+    CustomerId,
+    COUNT(*) AS InvoiceCount,
+    AVG(DATEDIFF(DAY, PreviousInvoiceDate, InvoiceDate)) AS AvgDaysBetweenPurchases
+FROM PurchaseIntervals
+WHERE PreviousInvoiceDate IS NOT NULL
+GROUP BY CustomerId;
+```
+##  US Customers and Their Total Purchases
+```sql
+SELECT 
+    c.FirstName + ' ' + c.LastName AS CustomerName,
+    SUM(i.Total) AS TotalSpent
+FROM Customer c
+JOIN Invoice i ON c.CustomerId = i.CustomerId
+WHERE c.Country = 'USA'
+GROUP BY c.FirstName, c.LastName
+ORDER BY TotalSpent DESC;
+```
+## Top 3 Invoices by Total Amount
+```sql
+SELECT 
+    InvoiceId,
+    Total
+FROM Invoice
+ORDER BY Total DESC
+OFFSET 0 ROWS FETCH NEXT 3 ROWS ONLY;
+```
+## Total Revenue per InvoiceLine
+```sql
+SELECT 
+    InvoiceLineId,
+    UnitPrice,
+    Quantity,
+    UnitPrice * Quantity AS LineTotal
+FROM InvoiceLine;
+```
+## Employees Who Are Also Managers
+```sql
+SELECT 
+    FirstName, LastName, Title
+FROM Employee
+WHERE EmployeeId IN (SELECT ReportsTo FROM Employee WHERE ReportsTo IS NOT NULL);
+```
+## Track Count per Playlist
+```sql
+SELECT 
+    Playlist.Name,
+    COUNT(PlaylistTrack.TrackId) AS TrackCount
+FROM Playlist
+JOIN PlaylistTrack ON Playlist.PlaylistId = PlaylistTrack.PlaylistId
+GROUP BY Playlist.Name
+ORDER BY TrackCount DESC;
+```
+## Tracks That Were Never Sold
+```sql
+SELECT *
+FROM Track
+WHERE TrackId NOT IN (SELECT DISTINCT TrackId FROM InvoiceLine);
+```
+## Customers Who Have Never Bought Anything
+```sql
+SELECT *
+FROM Customer
+WHERE CustomerId NOT IN (SELECT DISTINCT CustomerId FROM Invoice);
+```
