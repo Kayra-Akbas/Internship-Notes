@@ -853,5 +853,31 @@ JOIN EXTRA_COURSES_PICKED e
 ON c.STUDENT_ID = e.STUDENT_ID;
 ```
 ## DAY 6 BASIC SQL CODES WITH CHINHOOK DATEBASE
+ ## Connecting to the Chinhook database**
+ ```sql
+  USE Chinook;
+GO
+```
+## View All Customers
+ ```sql
+SELECT * FROM Customer;
+ ```
+## List All Tracks with Album and Artist Name
+ ```sql
+SELECT 
+    Track.Name AS TrackName,
+    Album.Title AS AlbumTitle,
+    Artist.Name AS ArtistName
+FROM Track
+JOIN Album ON Track.AlbumId = Album.AlbumId
+JOIN Artist ON Album.ArtistId = Artist.ArtistId;
+ ```
+##  Show All Tracks in the 'Rock' Genre
+ ```sql
+SELECT Track.Name, Genre.Name AS Genre
+FROM Track
+JOIN Genre ON Track.GenreId = Genre.GenreId
+WHERE Genre.Name = 'Rock';
+ ```
 
 
