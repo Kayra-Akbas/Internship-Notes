@@ -881,5 +881,36 @@ FROM Track
 JOIN Genre ON Track.GenreId = Genre.GenreId
 WHERE Genre.Name = 'Rock';
  ```
-
+## List All Invoices with Customer Info
+ ```sql
+SELECT 
+    Invoice.InvoiceId,
+    Customer.FirstName,
+    Customer.LastName,
+    Invoice.Total,
+    Invoice.InvoiceDate
+FROM Invoice
+JOIN Customer ON Invoice.CustomerId = Customer.CustomerId;
+```
+## Top 5 Most Expensive Tracks
+ ```sql
+SELECT Name, UnitPrice
+FROM Track
+ORDER BY UnitPrice DESC
+LIMIT 5;
+ ```
+## Total Sales per Country
+ ```sql
+SELECT 
+    BillingCountry,
+    SUM(Total) AS TotalSales
+FROM Invoice
+GROUP BY BillingCountry
+ORDER BY TotalSales DESC;
+ ```
+## List All Employees and Their Roles
+```sql
+SELECT FirstName, LastName, Title
+FROM Employee;
+```
 
