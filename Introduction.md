@@ -1135,3 +1135,23 @@ SELECT *
 FROM Customer
 WHERE CustomerId NOT IN (SELECT DISTINCT CustomerId FROM Invoice);
 ```
+## List of Artists and How Many Albums They Have
+```sql
+SELECT 
+    Artist.Name,
+    COUNT(Album.AlbumId) AS AlbumCount
+FROM Artist
+JOIN Album ON Artist.ArtistId = Album.ArtistId
+GROUP BY Artist.Name
+ORDER BY AlbumCount DESC;
+```
+## See All Grunge Tracks
+```sql
+SELECT Track.Name AS TrackName, Artist.Name AS ArtistName, Album.Title AS AlbumTitle
+FROM Track
+JOIN Genre ON Track.GenreId = Genre.GenreId
+JOIN Album ON Track.AlbumId = Album.AlbumId
+JOIN Artist ON Album.ArtistId = Artist.ArtistId
+WHERE Genre.Name = 'Grunge';
+```
+## 
