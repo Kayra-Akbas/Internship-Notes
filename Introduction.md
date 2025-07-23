@@ -979,3 +979,44 @@ FROM Employee e
 JOIN Customer c ON e.EmployeeId = c.SupportRepId
 ORDER BY e.LastName, c.LastName;
 ```
+## Albums With More Than 10 Tracks
+```sql
+SELECT 
+    Album.Title,
+    COUNT(Track.TrackId) AS TrackCount
+FROM Album
+JOIN Track ON Album.AlbumId = Track.AlbumId
+GROUP BY Album.Title
+HAVING COUNT(Track.TrackId) > 10
+ORDER BY TrackCount DESC;
+```
+## Customers Who Bought Tracks from AC/DC
+```sql
+SELECT DISTINCT 
+    c.FirstName + ' ' + c.LastName AS CustomerName
+FROM Customer c
+JOIN Invoice i ON c.CustomerId = i.CustomerId
+JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+JOIN Track t ON il.TrackId = t.TrackId
+JOIN Album a ON t.AlbumId = a.AlbumId
+JOIN Artist ar ON a.ArtistId = ar.ArtistId
+WHERE ar.Name = 'AC/DC';
+```
+##  Find Duplicate Customer Emails
+```sql
+SELECT Email, COUNT(*) AS Count
+FROM Customer
+GROUP BY Email
+HAVING COUNT(*) > 1;
+```
+## Invoice Summary: Number of Items per Invoice 
+```sql
+SELECT 
+    Invoice.InvoiceId,
+    COUNT(InvoiceLine.InvoiceLineId) AS Items,
+    SUM(InvoiceLine.UnitPrice * InvoiceLine.Quantity) AS Total
+FROM Invoice
+JOIN InvoiceLine ON Invoice.InvoiceId = InvoiceLine.InvoiceId
+GROUP BY Invoice.InvoiceId
+ORDER BY Total DESC;
+```
