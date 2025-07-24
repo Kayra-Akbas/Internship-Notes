@@ -1435,3 +1435,61 @@ FROM TopCustomers tc
 LEFT JOIN TopAlbumRevenue tar ON tc.CustomerId = tar.CustomerId
 ORDER BY tc.TotalSpent DESC;
 ```
+## Top Artist per Country and Their Best-Earning Album in that Country
+```sql
+WITH ArtistRevenueByCountry AS (
+    SELECT
+        c.Country,
+        ar.ArtistId,
+        ar.Name AS ArtistName,
+        SUM(il.UnitPrice * il.Quantity) AS TotalArtistRevenue
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY c.Country, ar.ArtistId, ar.Name
+),
+RankedArtists AS (
+    SELECT *,
+        RANK() OVER (PARTITION BY Country ORDER BY TotalArtistRevenue DESC) AS ArtistRank
+    FROM ArtistRevenueByCountry
+),
+
+-- Step 2: Revenue per album per country (still linked to artist)
+AlbumRevenueByCountry AS (
+    SELECT
+        c.Country,
+        ar.ArtistId,
+        ar.Name AS ArtistName,
+        al.Title AS AlbumTitle,
+        SUM(il.UnitPrice * il.Quantity) AS AlbumRevenue
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY c.Country, ar.ArtistId, ar.Name, al.Title
+),
+RankedAlbums AS (
+    SELECT *,
+        RANK() OVER (PARTITION BY Country, ArtistId ORDER BY AlbumRevenue DESC) AS AlbumRank
+    FROM AlbumRevenueByCountry
+)
+
+-- Final output: Top artist per country + their best album
+SELECT
+    ra.Country,
+    ra.ArtistName,
+    ra.TotalArtistRevenue,
+    alb.AlbumTitle AS TopAlbum,
+    alb.AlbumRevenue AS TopAlbumRevenue
+FROM RankedArtists ra
+JOIN RankedAlbums alb 
+    ON ra.Country = alb.Country 
+    AND ra.ArtistId = alb.ArtistId
+WHERE ra.ArtistRank = 1 AND alb.AlbumRank = 1
+ORDER BY ra.Country;
+```
