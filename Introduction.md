@@ -1242,7 +1242,7 @@ WHERE g.GenreRank = 1
 GROUP BY g.EmployeeName, g.GenreName
 ORDER BY g.EmployeeName;
 ```
-## The Top 3 songs and Top Genre  Bought by  the Top 5 Customers
+## The Top 3 songs and Top Genre  Bought by  the Top 5 Customers and How Much They are Spending
 ```sql
 WITH CustomerSpending AS (
     SELECT 
