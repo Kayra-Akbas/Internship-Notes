@@ -1691,3 +1691,111 @@ INNER JOIN (
 INNER JOIN TotalArtistRevenue tar ON ac.ArtistId = tar.ArtistId
 ORDER BY ac.AlbumCount DESC, PercentFromTopCountry DESC;
 ```
+## Artist Sales Summary: Album Counts, Revenue by Country, Top Genre, and Top Track's Album Sales
+```sql
+WITH AlbumCounts AS (
+    SELECT 
+        ar.ArtistId,
+        ar.Name AS ArtistName,
+        COUNT(al.AlbumId) AS AlbumCount
+    FROM Artist ar
+    JOIN Album al ON ar.ArtistId = al.ArtistId
+    GROUP BY ar.ArtistId, ar.Name
+),
+
+ArtistRevenueByCountry AS (
+    SELECT 
+        ar.ArtistId,
+        c.Country,
+        SUM(il.UnitPrice * il.Quantity) AS TotalRevenue
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY ar.ArtistId, c.Country
+),
+
+TopCountryPerArtist AS (
+    SELECT 
+        ArtistId,
+        Country,
+        TotalRevenue,
+        RANK() OVER (PARTITION BY ArtistId ORDER BY TotalRevenue DESC) AS CountryRank
+    FROM ArtistRevenueByCountry
+),
+
+TotalArtistRevenue AS (
+    SELECT 
+        ar.ArtistId,
+        SUM(il.UnitPrice * il.Quantity) AS TotalGlobalRevenue
+    FROM InvoiceLine il
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY ar.ArtistId
+),
+
+ArtistGenreSales AS (
+    SELECT 
+        ar.ArtistId,
+        g.Name AS GenreName,
+        SUM(il.UnitPrice * il.Quantity) AS GenreRevenue,
+        RANK() OVER (PARTITION BY ar.ArtistId ORDER BY SUM(il.UnitPrice * il.Quantity) DESC) AS GenreRank
+    FROM InvoiceLine il
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY ar.ArtistId, g.Name
+),
+TopTrackWithAlbum AS (
+    SELECT TOP 1 WITH TIES
+        ar.ArtistId,
+        t.TrackId,
+        t.Name AS TrackName,
+        al.AlbumId
+    FROM InvoiceLine il
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY ar.ArtistId, t.TrackId, t.Name, al.AlbumId
+    ORDER BY SUM(il.Quantity) DESC
+),
+AlbumSalesQuantity AS (
+    SELECT 
+        tta.ArtistId,
+        tta.TrackName,
+        tta.AlbumId,
+        SUM(il.Quantity) AS AlbumQuantity
+    FROM TopTrackWithAlbum tta
+    JOIN InvoiceLine il ON il.TrackId IN (
+        SELECT TrackId FROM Track WHERE AlbumId = tta.AlbumId
+    )
+    GROUP BY tta.ArtistId, tta.TrackName, tta.AlbumId
+)
+
+SELECT 
+    ac.ArtistName,
+    ac.AlbumCount,
+    tca.Country AS TopCountry,
+    tca.TotalRevenue AS RevenueInTopCountry,
+    tar.TotalGlobalRevenue,
+    ROUND(100.0 * tca.TotalRevenue / tar.TotalGlobalRevenue, 2) AS PercentFromTopCountry,
+    ags.GenreName AS TopGenre,
+    ISNULL(asq.TrackName, 'No Tracks Sold') AS TopTrack,
+    ISNULL(asq.AlbumQuantity, 0) AS AlbumSaleQuantityOfTopTrack
+FROM AlbumCounts ac
+INNER JOIN (
+    SELECT * FROM TopCountryPerArtist WHERE CountryRank = 1
+) tca ON ac.ArtistId = tca.ArtistId
+INNER JOIN TotalArtistRevenue tar ON ac.ArtistId = tar.ArtistId
+INNER JOIN (
+    SELECT ArtistId, GenreName FROM ArtistGenreSales WHERE GenreRank = 1
+) ags ON ac.ArtistId = ags.ArtistId
+LEFT JOIN AlbumSalesQuantity asq ON ac.ArtistId = asq.ArtistId
+ORDER BY ac.AlbumCount DESC, PercentFromTopCountry DESC;
+
+
+```
