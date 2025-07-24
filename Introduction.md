@@ -1361,3 +1361,77 @@ JOIN RankedTracks t ON g.Country = t.Country
 WHERE g.GenreRank = 1 AND t.TrackRank = 1
 ORDER BY g.Country;
 ```
+## Top 3 Albums Revenue for Top 5 Customers + Revenue Contribution
+```sql
+WITH CustomerSpending AS (
+    SELECT 
+        c.CustomerId,
+        c.FirstName + ' ' + c.LastName AS CustomerName,
+        SUM(i.Total) AS TotalSpent
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    GROUP BY c.CustomerId, c.FirstName, c.LastName
+),
+TopCustomers AS (
+    SELECT TOP 5 *
+    FROM CustomerSpending
+    ORDER BY TotalSpent DESC
+),
+AlbumRevenue AS (
+    SELECT 
+        c.CustomerId,
+        al.Title AS AlbumTitle,
+        SUM(il.UnitPrice * il.Quantity) AS AlbumTotal
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    WHERE c.CustomerId IN (SELECT CustomerId FROM TopCustomers)
+    GROUP BY c.CustomerId, al.Title
+),
+
+RankedAlbums AS (
+    SELECT 
+        CustomerId,
+        AlbumTitle,
+        AlbumTotal,
+        ROW_NUMBER() OVER (PARTITION BY CustomerId ORDER BY AlbumTotal DESC) AS AlbumRank
+    FROM AlbumRevenue
+),
+TopAlbumRevenue AS (
+    SELECT 
+        CustomerId,
+        MAX(CASE WHEN AlbumRank = 1 THEN AlbumTitle END) AS TopAlbum1,
+        MAX(CASE WHEN AlbumRank = 1 THEN AlbumTotal END) AS TopAlbum1Revenue,
+        MAX(CASE WHEN AlbumRank = 2 THEN AlbumTitle END) AS TopAlbum2,
+        MAX(CASE WHEN AlbumRank = 2 THEN AlbumTotal END) AS TopAlbum2Revenue,
+        MAX(CASE WHEN AlbumRank = 3 THEN AlbumTitle END) AS TopAlbum3,
+        MAX(CASE WHEN AlbumRank = 3 THEN AlbumTotal END) AS TopAlbum3Revenue
+    FROM RankedAlbums
+    WHERE AlbumRank <= 3
+    GROUP BY CustomerId
+)
+SELECT 
+    tc.CustomerName,
+    tc.TotalSpent,
+
+    tar.TopAlbum1,
+    tar.TopAlbum1Revenue,
+
+    tar.TopAlbum2,
+    tar.TopAlbum2Revenue,
+
+    tar.TopAlbum3,
+    tar.TopAlbum3Revenue,
+
+    ISNULL(tar.TopAlbum1Revenue, 0) + ISNULL(tar.TopAlbum2Revenue, 0) + ISNULL(tar.TopAlbum3Revenue, 0) AS TotalFromTop3Albums,
+
+    ROUND(
+        100.0 * (ISNULL(tar.TopAlbum1Revenue, 0) + ISNULL(tar.TopAlbum2Revenue, 0) + ISNULL(tar.TopAlbum3Revenue, 0)) / tc.TotalSpent,
+        2
+    ) AS PercentOfRevenueFromTop3
+FROM TopCustomers tc
+LEFT JOIN TopAlbumRevenue tar ON tc.CustomerId = tar.CustomerId
+ORDER BY tc.TotalSpent DESC;
+```
