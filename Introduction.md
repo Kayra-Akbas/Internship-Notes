@@ -1176,7 +1176,7 @@ WHERE i.InvoiceId IS NULL;
 ```
 ##  Tracks From Albums with Short Titles (< 20 chars) AND Metal Genre
 ```sql
-ELECT 
+SELECT 
     t.TrackId,
     t.Name AS TrackName,
     a.Title AS AlbumTitle,
@@ -1186,4 +1186,59 @@ JOIN Album a ON t.AlbumId = a.AlbumId
 JOIN Genre g ON t.GenreId = g.GenreId
 WHERE LEN(a.Title) < 20
   AND g.Name = 'Metal';
+```
+## DAY 8 SQL PRACTICES WITH DATABASE
+## Selecting Top 3 Bands and Top Genres of the Customers Who Are Also Employee
+```sql
+WITH GenreSales AS (
+    SELECT 
+        e.EmployeeId,
+        e.FirstName + ' ' + e.LastName AS EmployeeName,
+        g.Name AS GenreName,
+        COUNT(*) AS GenrePurchaseCount
+    FROM Customer c
+    JOIN Employee e ON c.SupportRepId = e.EmployeeId
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    GROUP BY e.EmployeeId, e.FirstName, e.LastName, g.Name
+),
+RankedGenres AS (
+    SELECT *,
+        RANK() OVER (PARTITION BY EmployeeId ORDER BY GenrePurchaseCount DESC) AS GenreRank
+    FROM GenreSales
+),
+ArtistSales AS (
+    SELECT 
+        e.EmployeeId,
+        e.FirstName + ' ' + e.LastName AS EmployeeName,
+        ar.Name AS ArtistName,
+        COUNT(*) AS TracksPurchased
+    FROM Customer c
+    JOIN Employee e ON c.SupportRepId = e.EmployeeId
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY e.EmployeeId, e.FirstName, e.LastName, ar.Name
+),
+RankedArtists AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY EmployeeId ORDER BY TracksPurchased DESC) AS ArtistRank
+    FROM ArtistSales
+)
+
+SELECT 
+    g.EmployeeName,
+    g.GenreName AS TopGenre,
+    MAX(CASE WHEN a.ArtistRank = 1 THEN a.ArtistName END) AS TopArtist1,
+    MAX(CASE WHEN a.ArtistRank = 2 THEN a.ArtistName END) AS TopArtist2,
+    MAX(CASE WHEN a.ArtistRank = 3 THEN a.ArtistName END) AS TopArtist3
+FROM RankedGenres g
+LEFT JOIN RankedArtists a ON g.EmployeeId = a.EmployeeId
+WHERE g.GenreRank = 1
+GROUP BY g.EmployeeName, g.GenreName
+ORDER BY g.EmployeeName;
 ```
