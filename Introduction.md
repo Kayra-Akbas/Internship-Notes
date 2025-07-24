@@ -1242,3 +1242,76 @@ WHERE g.GenreRank = 1
 GROUP BY g.EmployeeName, g.GenreName
 ORDER BY g.EmployeeName;
 ```
+## The Top 3 songs and Top Genre  Bought by  the Top 5 Customers
+```sql
+WITH CustomerSpending AS (
+    SELECT 
+        c.CustomerId,
+        c.FirstName + ' ' + c.LastName AS CustomerName,
+        SUM(i.Total) AS TotalSpent
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    GROUP BY c.CustomerId, c.FirstName, c.LastName
+),
+TopCustomers AS (
+    SELECT TOP 5 *
+    FROM CustomerSpending
+    ORDER BY TotalSpent DESC
+),
+
+
+TrackPurchases AS (
+    SELECT 
+        c.CustomerId,
+        c.FirstName + ' ' + c.LastName AS CustomerName,
+        t.Name AS TrackName,
+        COUNT(*) AS TimesBought
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    WHERE c.CustomerId IN (SELECT CustomerId FROM TopCustomers)
+    GROUP BY c.CustomerId, c.FirstName, c.LastName, t.Name
+),
+RankedTracks AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY CustomerId ORDER BY TimesBought DESC) AS TrackRank
+    FROM TrackPurchases
+),
+
+
+GenrePurchases AS (
+    SELECT 
+        c.CustomerId,
+        c.FirstName + ' ' + c.LastName AS CustomerName,
+        g.Name AS GenreName,
+        COUNT(*) AS GenreCount
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    WHERE c.CustomerId IN (SELECT CustomerId FROM TopCustomers)
+    GROUP BY c.CustomerId, c.FirstName, c.LastName, g.Name
+),
+RankedGenres AS (
+    SELECT *,
+        ROW_NUMBER() OVER (PARTITION BY CustomerId ORDER BY GenreCount DESC) AS GenreRank
+    FROM GenrePurchases
+)
+
+
+SELECT 
+    tc.CustomerName,
+    tc.TotalSpent,
+    MAX(CASE WHEN rt.TrackRank = 1 THEN rt.TrackName END) AS TopTrack1,
+    MAX(CASE WHEN rt.TrackRank = 2 THEN rt.TrackName END) AS TopTrack2,
+    MAX(CASE WHEN rt.TrackRank = 3 THEN rt.TrackName END) AS TopTrack3,
+    MAX(CASE WHEN rg.GenreRank = 1 THEN rg.GenreName END) AS TopGenre
+FROM TopCustomers tc
+LEFT JOIN RankedTracks rt ON tc.CustomerId = rt.CustomerId
+LEFT JOIN RankedGenres rg ON tc.CustomerId = rg.CustomerId
+GROUP BY tc.CustomerName, tc.TotalSpent
+ORDER BY tc.TotalSpent DESC;
+
+```
