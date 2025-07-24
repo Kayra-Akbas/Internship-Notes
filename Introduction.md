@@ -1521,5 +1521,61 @@ SELECT
 FROM TopCustomers tc
 CROSS JOIN TotalRevenue tr
 ORDER BY tc.TotalSpent DESC;
+```
+## Artists' Album Counts and Their Top-Earning Country Revenue Share
+```sql
 
+WITH AlbumCounts AS (
+    SELECT 
+        ar.ArtistId,
+        ar.Name AS ArtistName,
+        COUNT(al.AlbumId) AS AlbumCount
+    FROM Artist ar
+    JOIN Album al ON ar.ArtistId = al.ArtistId
+    GROUP BY ar.ArtistId, ar.Name
+),
+ArtistRevenueByCountry AS (
+    SELECT 
+        ar.ArtistId,
+        c.Country,
+        SUM(il.UnitPrice * il.Quantity) AS TotalRevenue
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY ar.ArtistId, c.Country
+),
+TopCountryPerArtist AS (
+    SELECT 
+        ArtistId,
+        Country,
+        TotalRevenue,
+        RANK() OVER (PARTITION BY ArtistId ORDER BY TotalRevenue DESC) AS CountryRank
+    FROM ArtistRevenueByCountry
+),
+TotalArtistRevenue AS (
+    SELECT 
+        ar.ArtistId,
+        SUM(il.UnitPrice * il.Quantity) AS TotalGlobalRevenue
+    FROM InvoiceLine il
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY ar.ArtistId
+)
+SELECT 
+    ac.ArtistName,
+    ac.AlbumCount,
+    tca.Country AS TopCountry,
+    tca.TotalRevenue AS RevenueInTopCountry,
+    tar.TotalGlobalRevenue,
+    ROUND(100.0 * tca.TotalRevenue / tar.TotalGlobalRevenue, 2) AS PercentFromTopCountry
+FROM AlbumCounts ac
+LEFT JOIN (
+    SELECT * FROM TopCountryPerArtist WHERE CountryRank = 1
+) tca ON ac.ArtistId = tca.ArtistId
+LEFT JOIN TotalArtistRevenue tar ON ac.ArtistId = tar.ArtistId
+ORDER BY PercentFromTopCountry DESC;
 ```
