@@ -1313,5 +1313,4 @@ LEFT JOIN RankedTracks rt ON tc.CustomerId = rt.CustomerId
 LEFT JOIN RankedGenres rg ON tc.CustomerId = rg.CustomerId
 GROUP BY tc.CustomerName, tc.TotalSpent
 ORDER BY tc.TotalSpent DESC;
-
 ```
