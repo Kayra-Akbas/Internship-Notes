@@ -1493,4 +1493,33 @@ JOIN RankedAlbums alb
 WHERE ra.ArtistRank = 1 AND alb.AlbumRank = 1
 ORDER BY ra.Country;
 ```
-##
+## Top 10 Customers by Revenue and their % of the Total Revenue
+```sql
+WITH TotalRevenue AS (
+    SELECT SUM(Total) AS GlobalRevenue
+    FROM Invoice
+),
+CustomerSpending AS (
+    SELECT 
+        c.CustomerId,
+        c.FirstName + ' ' + c.LastName AS CustomerName,
+        SUM(i.Total) AS TotalSpent
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    GROUP BY c.CustomerId, c.FirstName, c.LastName
+),
+TopCustomers AS (
+    SELECT TOP 10 *
+    FROM CustomerSpending
+    ORDER BY TotalSpent DESC
+)
+SELECT 
+    tc.CustomerName,
+    tc.TotalSpent,
+    tr.GlobalRevenue,
+    ROUND(100.0 * tc.TotalSpent / tr.GlobalRevenue, 2) AS PercentOfTotalRevenue
+FROM TopCustomers tc
+CROSS JOIN TotalRevenue tr
+ORDER BY tc.TotalSpent DESC;
+
+```
