@@ -1300,7 +1300,6 @@ RankedGenres AS (
     FROM GenrePurchases
 )
 
-
 SELECT 
     tc.CustomerName,
     tc.TotalSpent,
@@ -1313,4 +1312,52 @@ LEFT JOIN RankedTracks rt ON tc.CustomerId = rt.CustomerId
 LEFT JOIN RankedGenres rg ON tc.CustomerId = rg.CustomerId
 GROUP BY tc.CustomerName, tc.TotalSpent
 ORDER BY tc.TotalSpent DESC;
+```
+## Top Genre and Most Purchased Song by Country (Excluding One-Time Sales)
+```sql
+WITH GenreSalesByCountry AS (
+    SELECT 
+        c.Country,
+        g.Name AS GenreName,
+        COUNT(*) AS GenreSales
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    GROUP BY c.Country, g.Name
+    HAVING COUNT(*) > 1  
+),
+RankedGenres AS (
+    SELECT *,
+        RANK() OVER (PARTITION BY Country ORDER BY GenreSales DESC) AS GenreRank
+    FROM GenreSalesByCountry
+),
+TrackSalesByCountry AS (
+    SELECT 
+        c.Country,
+        t.Name AS TrackName,
+        COUNT(*) AS TrackSales
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    GROUP BY c.Country, t.Name
+    HAVING COUNT(*) > 1  
+),
+RankedTracks AS (
+    SELECT *,
+        RANK() OVER (PARTITION BY Country ORDER BY TrackSales DESC) AS TrackRank
+    FROM TrackSalesByCountry
+)
+SELECT 
+    g.Country,
+    g.GenreName AS TopGenre,
+    g.GenreSales,
+    t.TrackName AS TopTrack,
+    t.TrackSales
+FROM RankedGenres g
+JOIN RankedTracks t ON g.Country = t.Country
+WHERE g.GenreRank = 1 AND t.TrackRank = 1
+ORDER BY g.Country;
 ```
