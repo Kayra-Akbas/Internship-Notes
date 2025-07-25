@@ -2116,3 +2116,7 @@ LEFT JOIN TopTrackPerArtistGenre tt
 WHERE tg.GenreArtistRank = 1
 ORDER BY tg.TotalRevenue DESC;
 ```
+## Most Loyal Customers by Artist
+```sql
+
+```
