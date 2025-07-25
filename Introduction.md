@@ -2118,5 +2118,52 @@ ORDER BY tg.TotalRevenue DESC;
 ```
 ## Most Loyal Customers by Artist
 ```sql
+WITH CustomerArtistSales AS (
+    SELECT 
+        ar.ArtistId,
+        ar.Name AS ArtistName,
+        c.CustomerId,
+        CONCAT(c.FirstName, ' ', c.LastName) AS CustomerName,
+        c.Country,
+        COUNT(il.InvoiceLineId) AS TracksBought,
+        SUM(il.UnitPrice * il.Quantity) AS TotalSpent
+    FROM InvoiceLine il
+    JOIN Invoice i ON il.InvoiceId = i.InvoiceId
+    JOIN Customer c ON i.CustomerId = c.CustomerId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY ar.ArtistId, ar.Name, c.CustomerId, c.FirstName, c.LastName, c.Country
+),
+RankedCustomerArtistSales AS (
+    SELECT *,
+        RANK() OVER (PARTITION BY ArtistId ORDER BY TracksBought DESC, TotalSpent DESC) AS CustomerRank
+    FROM CustomerArtistSales
+),
+ArtistTopGenre AS (
+    SELECT 
+        ar.ArtistId,
+        g.Name AS GenreName,
+        SUM(il.UnitPrice * il.Quantity) AS GenreRevenue,
+        RANK() OVER (PARTITION BY ar.ArtistId ORDER BY SUM(il.UnitPrice * il.Quantity) DESC) AS GenreRank
+    FROM InvoiceLine il
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY ar.ArtistId, g.Name
+)
+
+SELECT 
+    rcas.ArtistName,
+    rcas.CustomerName,
+    rcas.Country,
+    rcas.TracksBought,
+    ROUND(rcas.TotalSpent, 2) AS TotalSpent,
+    atg.GenreName AS TopGenre
+FROM RankedCustomerArtistSales rcas
+LEFT JOIN ArtistTopGenre atg ON rcas.ArtistId = atg.ArtistId AND atg.GenreRank = 1
+WHERE rcas.CustomerRank = 1
+ORDER BY rcas.ArtistName;
 
 ```
