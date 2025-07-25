@@ -2064,5 +2064,54 @@ ORDER BY ac.AlbumCount DESC, PercentFromTopCountry DESC;
 ```
 ## DAY 9 SQL SCENARIOS USING CHINHOOK
 ```sql
+WITH ArtistGenreRevenue AS (
+    SELECT 
+        g.GenreId,
+        g.Name AS GenreName,
+        ar.ArtistId,
+        ar.Name AS ArtistName,
+        SUM(il.UnitPrice * il.Quantity) AS TotalRevenue,
+        SUM(il.Quantity) AS TotalTracksSold
+    FROM InvoiceLine il
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY g.GenreId, g.Name, ar.ArtistId, ar.Name
+),
+TopArtistPerGenre AS (
+    SELECT *,
+        RANK() OVER (PARTITION BY GenreId ORDER BY TotalRevenue DESC) AS GenreArtistRank
+    FROM ArtistGenreRevenue
+),
+TopTrackPerArtistGenre AS (
+    SELECT 
+        g.GenreId,
+        ar.ArtistId,
+        t.TrackId,
+        t.Name AS TrackName,
+        mt.Name AS MediaType,
+        SUM(il.Quantity) AS TrackQuantity,
+        RANK() OVER (PARTITION BY g.GenreId, ar.ArtistId ORDER BY SUM(il.Quantity) DESC) AS TrackRank
+    FROM InvoiceLine il
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN MediaType mt ON t.MediaTypeId = mt.MediaTypeId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    GROUP BY g.GenreId, ar.ArtistId, t.TrackId, t.Name, mt.Name
+)
 
+SELECT 
+    tg.GenreName,
+    tg.ArtistName AS TopArtist,
+    tg.TotalRevenue,
+    tg.TotalTracksSold,
+    ISNULL(tt.TrackName, 'No track') AS TopTrack,
+    ISNULL(tt.MediaType, 'Unknown') AS MediaType
+FROM TopArtistPerGenre tg
+LEFT JOIN TopTrackPerArtistGenre tt 
+    ON tg.GenreId = tt.GenreId AND tg.ArtistId = tt.ArtistId AND tt.TrackRank = 1
+WHERE tg.GenreArtistRank = 1
+ORDER BY tg.TotalRevenue DESC;
 ```
