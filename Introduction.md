@@ -2062,4 +2062,4 @@ LEFT JOIN AlbumSalesQuantityRanked asq ON ac.ArtistId = asq.ArtistId AND asq.rn 
 LEFT JOIN ArtistTrackStats ats ON ac.ArtistId = ats.ArtistId
 ORDER BY ac.AlbumCount DESC, PercentFromTopCountry DESC;
 ```
-## DAY 9
+## DAY 9 SQL SCENARIOS USING CHINHOOK
