@@ -2167,4 +2167,4 @@ WHERE rcas.CustomerRank = 1
 ORDER BY rcas.ArtistName;
 
 ```
-## DAY 9 SQL
+## DAY 9 SQL SCENARIOS USING CHINHOOK
