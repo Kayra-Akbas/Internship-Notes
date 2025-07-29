@@ -2310,5 +2310,53 @@ ORDER BY Revenue DESC;
 ```
 ## Best-Selling Music Albums by Country (Filtered by Media Type)"
 ```sql
+WITH AlbumSalesByCountry AS (
+    SELECT 
+        c.Country,
+        al.AlbumId,
+        al.Title AS AlbumTitle,
+        ar.Name AS ArtistName,
+        SUM(il.UnitPrice * il.Quantity) AS Revenue
+    FROM InvoiceLine il
+    JOIN Invoice i ON il.InvoiceId = i.InvoiceId
+    JOIN Customer c ON i.CustomerId = c.CustomerId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN MediaType mt ON t.MediaTypeId = mt.MediaTypeId
+    JOIN Album al ON t.AlbumId = al.AlbumId
+    JOIN Artist ar ON al.ArtistId = ar.ArtistId
+    WHERE mt.Name IN ('MPEG audio file', 'AAC audio file', 'Protected AAC audio file')
+    GROUP BY c.Country, al.AlbumId, al.Title, ar.Name
+),
+
+TotalCountryRevenue AS (
+    SELECT 
+        Country,
+        SUM(Revenue) AS TotalRevenue
+    FROM AlbumSalesByCountry
+    GROUP BY Country
+),
+
+RankedAlbums AS (
+    SELECT 
+        ascb.Country,
+        ascb.AlbumTitle,
+        ascb.ArtistName,
+        ascb.Revenue,
+        tcr.TotalRevenue,
+        ROUND(100.0 * ascb.Revenue / tcr.TotalRevenue, 2) AS PercentOfCountryRevenue,
+        RANK() OVER (PARTITION BY ascb.Country ORDER BY ascb.Revenue DESC) AS AlbumRank
+    FROM AlbumSalesByCountry ascb
+    JOIN TotalCountryRevenue tcr ON ascb.Country = tcr.Country
+)
+
+SELECT 
+    Country,
+    AlbumTitle AS BestSellingAlbum,
+    ArtistName,
+    ROUND(Revenue, 2) AS Revenue,
+    PercentOfCountryRevenue
+FROM RankedAlbums
+WHERE AlbumRank = 1
+ORDER BY Revenue DESC;
 
 ```
