@@ -2260,5 +2260,4 @@ SELECT
 FROM RankedGenrePerCountry
 WHERE GenreRank = 1
 ORDER BY Revenue DESC;
-
 ```
