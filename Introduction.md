@@ -2393,5 +2393,43 @@ SELECT
 FROM CustomerGenreCount cgc
 JOIN SingleGenreCustomers sgc ON cgc.CustomerId = sgc.CustomerId
 ORDER BY cgc.TotalSpent DESC;
-
 ```
+## High Spenders by Genre (Top 3 Customers Per Genre)
+For each music genre, show the top 3 customers who spent the most money buying tracks from that genre.
+
+```sql
+WITH GenreSpending AS (
+    SELECT
+        g.Name AS GenreName,
+        c.CustomerId,
+        c.FirstName + ' ' + c.LastName AS CustomerName,
+        c.Country,
+        SUM(il.UnitPrice * il.Quantity) AS TotalSpent
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    GROUP BY g.Name, c.CustomerId, c.FirstName, c.LastName, c.Country
+),
+RankedSpenders AS (
+    SELECT *,
+        RANK() OVER (
+            PARTITION BY GenreName
+            ORDER BY TotalSpent DESC
+        ) AS GenreRank
+    FROM GenreSpending
+)
+
+SELECT
+    GenreName,
+    CustomerName,
+    Country,
+    TotalSpent,
+    GenreRank
+FROM RankedSpenders
+WHERE GenreRank <= 3
+ORDER BY GenreName, GenreRank;
+```
+
+## Find the Top 5 Customers by Total Spending
