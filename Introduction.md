@@ -2211,6 +2211,5 @@ SELECT
 FROM RankedGenreMedia
 WHERE MediaRank = 1
 ORDER BY PercentOfGenre DESC;
-
-
 ```
+##
