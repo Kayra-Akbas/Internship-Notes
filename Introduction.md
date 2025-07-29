@@ -2262,3 +2262,6 @@ WHERE GenreRank = 1
 ORDER BY Revenue DESC;
 ```
 ## Best-Selling Albums by Country
+```sql
+
+```
