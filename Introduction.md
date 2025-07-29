@@ -2433,3 +2433,15 @@ ORDER BY GenreName, GenreRank;
 ```
 
 ## Find the Top 5 Customers by Total Spending
+```sql
+SELECT TOP 5
+    c.FirstName + ' ' + c.LastName AS CustomerName,
+    c.Country,
+    COUNT(i.InvoiceId) AS TotalInvoices,
+    SUM(i.Total) AS TotalSpent
+FROM Customer c
+JOIN Invoice i ON c.CustomerId = i.CustomerId
+GROUP BY c.CustomerId, c.FirstName, c.LastName, c.Country
+ORDER BY TotalSpent DESC;
+
+```
