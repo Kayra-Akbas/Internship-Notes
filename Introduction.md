@@ -2215,5 +2215,50 @@ ORDER BY PercentOfGenre DESC;
 ```
 ## Country-Specific Genre Preferences
 ```sql
+WITH CountryGenreSales AS (
+    SELECT 
+        c.Country,
+        g.GenreId,
+        g.Name AS GenreName,
+        SUM(il.Quantity) AS TracksSold,
+        SUM(il.UnitPrice * il.Quantity) AS Revenue
+    FROM Invoice i
+    JOIN Customer c ON i.CustomerId = c.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    GROUP BY c.Country, g.GenreId, g.Name
+),
+
+CountryTotalSales AS (
+    SELECT 
+        Country,
+        SUM(Revenue) AS TotalCountryRevenue
+    FROM CountryGenreSales
+    GROUP BY Country
+),
+
+RankedGenrePerCountry AS (
+    SELECT 
+        cgs.Country,
+        cgs.GenreName,
+        cgs.TracksSold,
+        cgs.Revenue,
+        cts.TotalCountryRevenue,
+        ROUND(100.0 * cgs.Revenue / cts.TotalCountryRevenue, 2) AS PercentOfCountryRevenue,
+        RANK() OVER (PARTITION BY cgs.Country ORDER BY cgs.Revenue DESC) AS GenreRank
+    FROM CountryGenreSales cgs
+    JOIN CountryTotalSales cts ON cgs.Country = cts.Country
+)
+
+SELECT 
+    Country,
+    GenreName AS TopGenre,
+    TracksSold,
+    ROUND(Revenue, 2) AS Revenue,
+    PercentOfCountryRevenue
+FROM RankedGenrePerCountry
+WHERE GenreRank = 1
+ORDER BY Revenue DESC;
 
 ```
