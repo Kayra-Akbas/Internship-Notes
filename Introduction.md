@@ -2214,3 +2214,6 @@ WHERE MediaRank = 1
 ORDER BY PercentOfGenre DESC;
 ```
 ## Country-Specific Genre Preferences
+```sql
+
+```
