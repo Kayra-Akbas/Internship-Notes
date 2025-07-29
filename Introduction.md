@@ -2170,5 +2170,47 @@ ORDER BY rcas.ArtistName;
 ## DAY 10 SQL SCENARIOS USING CHINHOOK
 ## Media Type Popularity Across Genres
 ```sql
+WITH GenreMediaSales AS (
+    SELECT 
+        g.GenreId,
+        g.Name AS GenreName,
+        mt.MediaTypeId,
+        mt.Name AS MediaTypeName,
+        SUM(il.Quantity) AS TotalTracksSold
+    FROM InvoiceLine il
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    JOIN MediaType mt ON t.MediaTypeId = mt.MediaTypeId
+    GROUP BY g.GenreId, g.Name, mt.MediaTypeId, mt.Name
+),
+TotalGenreSales AS (
+    SELECT 
+        GenreId,
+        SUM(TotalTracksSold) AS GenreTotal
+    FROM GenreMediaSales
+    GROUP BY GenreId
+),
+RankedGenreMedia AS (
+    SELECT 
+        gms.GenreId,
+        gms.GenreName,
+        gms.MediaTypeName,
+        gms.TotalTracksSold,
+        tg.GenreTotal,
+        ROUND(100.0 * gms.TotalTracksSold / tg.GenreTotal, 2) AS PercentOfGenre,
+        RANK() OVER (PARTITION BY gms.GenreId ORDER BY gms.TotalTracksSold DESC) AS MediaRank
+    FROM GenreMediaSales gms
+    JOIN TotalGenreSales tg ON gms.GenreId = tg.GenreId
+)
+
+SELECT 
+    GenreName,
+    MediaTypeName AS MostPopularMediaType,
+    TotalTracksSold,
+    PercentOfGenre
+FROM RankedGenreMedia
+WHERE MediaRank = 1
+ORDER BY PercentOfGenre DESC;
+
 
 ```
