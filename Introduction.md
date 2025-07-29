@@ -2358,5 +2358,40 @@ SELECT
 FROM RankedAlbums
 WHERE AlbumRank = 1
 ORDER BY Revenue DESC;
+```
+##  Customers Who Only Buy One Genre
+```sql
+WITH CustomerGenreCount AS (
+    SELECT 
+        c.CustomerId,
+        c.FirstName + ' ' + c.LastName AS CustomerName,
+        c.Country,
+        g.Name AS GenreName,
+        COUNT(il.InvoiceLineId) AS TracksBought,
+        SUM(il.UnitPrice * il.Quantity) AS TotalSpent
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    GROUP BY c.CustomerId, c.FirstName, c.LastName, c.Country, g.Name
+),
+SingleGenreCustomers AS (
+    SELECT 
+        CustomerId
+    FROM CustomerGenreCount
+    GROUP BY CustomerId
+    HAVING COUNT(DISTINCT GenreName) = 1
+)
+
+SELECT 
+    cgc.CustomerName,
+    cgc.Country,
+    cgc.GenreName,
+    cgc.TracksBought,
+    ROUND(cgc.TotalSpent, 2) AS TotalSpent
+FROM CustomerGenreCount cgc
+JOIN SingleGenreCustomers sgc ON cgc.CustomerId = sgc.CustomerId
+ORDER BY cgc.TotalSpent DESC;
 
 ```
