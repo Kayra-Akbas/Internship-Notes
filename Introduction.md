@@ -2307,5 +2307,8 @@ SELECT
 FROM RankedAlbums
 WHERE AlbumRank = 1
 ORDER BY Revenue DESC;
+```
+## Best-Selling Music Albums by Country (Filtered by Media Type)"
+```sql
 
 ```
