@@ -2168,6 +2168,7 @@ ORDER BY rcas.ArtistName;
 
 ```
 ## DAY 10 SQL SCENARIOS USING CHINHOOK
+
 ## Media Type Popularity Across Genres
 ```sql
 WITH GenreMediaSales AS (
