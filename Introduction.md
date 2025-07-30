@@ -2446,3 +2446,4 @@ ORDER BY TotalSpent DESC;
 ```
 ## DAY 11 SQL Practices Using Chinhook
 ## Filtering to genres with at least 10 customers
+```sql
