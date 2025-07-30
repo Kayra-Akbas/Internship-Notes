@@ -2497,6 +2497,34 @@ FROM RankedSpenders
 WHERE GenreRank <= 3
 ORDER BY GenreName, GenreRank;
 ```
-## 
+## Top Media Type Used by Customers
 ```sql
-
+WITH MediaUsage AS (
+    SELECT 
+        c.CustomerId,
+        c.FirstName + ' ' + c.LastName AS CustomerName,
+        mt.Name AS MediaType,
+        COUNT(il.InvoiceLineId) AS PurchaseCount
+    FROM dbo.Customer c
+    JOIN dbo.Invoice i ON c.CustomerId = i.CustomerId
+    JOIN dbo.InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN dbo.Track t ON il.TrackId = t.TrackId
+    JOIN dbo.MediaType mt ON t.MediaTypeId = mt.MediaTypeId
+    GROUP BY c.CustomerId, c.FirstName, c.LastName, mt.Name
+),
+RankedMedia AS (
+    SELECT *,
+        RANK() OVER (
+            PARTITION BY CustomerId
+            ORDER BY PurchaseCount DESC
+        ) AS MediaRank
+    FROM MediaUsage
+)
+SELECT 
+    CustomerName,
+    MediaType,
+    PurchaseCount
+FROM RankedMedia
+WHERE MediaRank = 1
+ORDER BY CustomerName;
+```
