@@ -2497,3 +2497,6 @@ FROM RankedSpenders
 WHERE GenreRank <= 3
 ORDER BY GenreName, GenreRank;
 ```
+## 
+```sql
+
