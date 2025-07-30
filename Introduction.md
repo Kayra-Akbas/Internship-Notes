@@ -2447,8 +2447,6 @@ ORDER BY TotalSpent DESC;
 ## DAY 11 SQL Practices Using Chinhook
 ## Filtering to genres with at least 10 customers
 ```sql
-USE Chinook;
-GO
 WITH GenreSpending AS (
     SELECT
         g.GenreId,
@@ -2498,6 +2496,4 @@ SELECT
 FROM RankedSpenders
 WHERE GenreRank <= 3
 ORDER BY GenreName, GenreRank;
-
-
 ```
