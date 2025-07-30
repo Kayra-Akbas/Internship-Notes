@@ -2447,5 +2447,57 @@ ORDER BY TotalSpent DESC;
 ## DAY 11 SQL Practices Using Chinhook
 ## Filtering to genres with at least 10 customers
 ```sql
+USE Chinook;
+GO
+WITH GenreSpending AS (
+    SELECT
+        g.GenreId,
+        g.Name AS GenreName,
+        c.CustomerId,
+        c.FirstName + ' ' + c.LastName AS CustomerName,
+        c.Country,
+        SUM(il.UnitPrice * il.Quantity) AS TotalSpent
+    FROM Customer c
+    JOIN Invoice i ON c.CustomerId = i.CustomerId
+    JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+    JOIN Track t ON il.TrackId = t.TrackId
+    JOIN Genre g ON t.GenreId = g.GenreId
+    GROUP BY g.GenreId, g.Name, c.CustomerId, c.FirstName, c.LastName, c.Country
+),
+
+GenresWithEnoughCustomers AS (
+    SELECT
+        GenreId
+    FROM GenreSpending
+    GROUP BY GenreId
+    HAVING COUNT(DISTINCT CustomerId) >= 10
+),
+
+FilteredGenreSpending AS (
+    SELECT gs.*
+    FROM GenreSpending gs
+    JOIN GenresWithEnoughCustomers g10
+        ON gs.GenreId = g10.GenreId
+),
+
+RankedSpenders AS (
+    SELECT *,
+        RANK() OVER (
+            PARTITION BY GenreName
+            ORDER BY TotalSpent DESC
+        ) AS GenreRank
+    FROM FilteredGenreSpending
+)
+
+SELECT
+    GenreName,
+    CustomerName,
+    Country,
+    TotalSpent,
+    GenreRank
+FROM RankedSpenders
+WHERE GenreRank <= 3
+ORDER BY GenreName, GenreRank;
+
 
 ```
