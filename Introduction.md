@@ -2545,4 +2545,14 @@ GROUP BY c.CustomerId, c.FirstName, c.LastName, g.Name
 HAVING SUM(il.UnitPrice * il.Quantity) > 10
 ORDER BY TotalSpent DESC;
 ```
-##
+##  Customer Count per Country (Only Countries with > 1 Customer)
+```sql
+SELECT 
+    Country,
+    COUNT(*) AS NumberOfCustomers
+FROM Customer
+GROUP BY Country
+HAVING COUNT(*) > 1
+ORDER BY NumberOfCustomers DESC;
+```sql
+
