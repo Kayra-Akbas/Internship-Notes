@@ -2545,3 +2545,4 @@ GROUP BY c.CustomerId, c.FirstName, c.LastName, g.Name
 HAVING SUM(il.UnitPrice * il.Quantity) > 10
 ORDER BY TotalSpent DESC;
 ```
+##
