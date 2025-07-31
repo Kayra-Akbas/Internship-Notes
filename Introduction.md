@@ -2570,5 +2570,12 @@ ORDER BY NumberOfTracks DESC;
 ```
 ## Most Popular Media Types by Total Quantity Sold
 ```sql
-
+SELECT 
+    mt.Name AS MediaType,
+    SUM(il.Quantity) AS TotalSold
+FROM InvoiceLine il
+JOIN Track t ON il.TrackId = t.TrackId
+JOIN MediaType mt ON t.MediaTypeId = mt.MediaTypeId
+GROUP BY mt.Name
+ORDER BY TotalSold DESC;
 ```
