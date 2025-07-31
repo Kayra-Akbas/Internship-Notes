@@ -2567,3 +2567,8 @@ JOIN Track t ON al.AlbumId = t.AlbumId
 GROUP BY al.AlbumId, al.Title, ar.Name
 HAVING COUNT(t.TrackId) > 10
 ORDER BY NumberOfTracks DESC;
+```
+## Most Popular Media Types by Total Quantity Sold
+```sql
+
+```
