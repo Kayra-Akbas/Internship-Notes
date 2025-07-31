@@ -2555,4 +2555,5 @@ GROUP BY Country
 HAVING COUNT(*) > 1
 ORDER BY NumberOfCustomers DESC;
 ```
-
+## Albums with More Than 10 Tracks
+```sql
