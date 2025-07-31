@@ -2531,5 +2531,18 @@ ORDER BY CustomerName;
 ## DAY 12 SQL PRACTICES
 ##  Customer Spending by Genre (Over $10)
 ```sql
+SELECT 
+    c.CustomerId,
+    c.FirstName + ' ' + c.LastName AS CustomerName,
+    g.Name AS Genre,
+    ROUND(SUM(il.UnitPrice * il.Quantity), 2) AS TotalSpent
+FROM Customer c
+JOIN Invoice i ON c.CustomerId = i.CustomerId
+JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+JOIN Track t ON il.TrackId = t.TrackId
+JOIN Genre g ON t.GenreId = g.GenreId
+GROUP BY c.CustomerId, c.FirstName, c.LastName, g.Name
+HAVING SUM(il.UnitPrice * il.Quantity) > 10
+ORDER BY TotalSpent DESC;
 
 ```
