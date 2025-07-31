@@ -2557,3 +2557,13 @@ ORDER BY NumberOfCustomers DESC;
 ```
 ## Albums with More Than 10 Tracks
 ```sql
+SELECT 
+    al.Title AS AlbumTitle,
+    ar.Name AS Artist,
+    COUNT(t.TrackId) AS NumberOfTracks
+FROM Album al
+JOIN Artist ar ON al.ArtistId = ar.ArtistId
+JOIN Track t ON al.AlbumId = t.AlbumId
+GROUP BY al.AlbumId, al.Title, ar.Name
+HAVING COUNT(t.TrackId) > 10
+ORDER BY NumberOfTracks DESC;
