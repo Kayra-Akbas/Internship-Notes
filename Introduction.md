@@ -2529,6 +2529,7 @@ WHERE MediaRank = 1
 ORDER BY CustomerName;
 ```
 ## DAY 12 SQL PRACTICES
+##  Customer Spending by Genre (Over $10)
 ```sql
 
 ```
