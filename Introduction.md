@@ -2554,5 +2554,5 @@ FROM Customer
 GROUP BY Country
 HAVING COUNT(*) > 1
 ORDER BY NumberOfCustomers DESC;
-```sql
+```
 
