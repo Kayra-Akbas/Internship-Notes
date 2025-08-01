@@ -2589,20 +2589,19 @@ SELECT
 FROM Genre g
 JOIN Track t ON g.GenreId = t.GenreId
 JOIN InvoiceLine il ON t.TrackId = il.TrackId
-GROUP BY g.Name, t.Name
+GROUP BY g.GenreId, g.Name, t.Name
 HAVING SUM(il.Quantity) = (
-    SELECT MAX(SalesByTrack.Total)
+    SELECT MAX(GenreSales.Total)
     FROM (
         SELECT 
-            t2.GenreId,
             t2.Name,
+            t2.GenreId,
             SUM(il2.Quantity) AS Total
         FROM Track t2
         JOIN InvoiceLine il2 ON t2.TrackId = il2.TrackId
-        GROUP BY t2.GenreId, t2.Name
-        HAVING t2.GenreId = g.GenreId
-    ) AS SalesByTrack
+        WHERE t2.GenreId = g.GenreId
+        GROUP BY t2.Name, t2.GenreId
+    ) AS GenreSales
 )
 ORDER BY Genre;
-
 ```
