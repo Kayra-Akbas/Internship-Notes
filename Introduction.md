@@ -2606,3 +2606,12 @@ HAVING SUM(il.Quantity) = (
 ORDER BY Genre;
 ```
 ##  Tracks Longer Than Average Track Length
+SELECT 
+    t.TrackId,
+    t.Name AS TrackName,
+    ROUND(t.Milliseconds / 60000.0, 2) AS LengthInMinutes
+FROM Track t
+WHERE t.Milliseconds > (
+    SELECT AVG(Milliseconds) FROM Track
+)
+ORDER BY LengthInMinutes DESC;
