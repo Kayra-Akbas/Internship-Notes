@@ -2580,3 +2580,4 @@ GROUP BY mt.Name
 ORDER BY TotalSold DESC;
 ```
 ## DAY 13 SQL with Chinhook
+```
