@@ -2579,3 +2579,4 @@ JOIN MediaType mt ON t.MediaTypeId = mt.MediaTypeId
 GROUP BY mt.Name
 ORDER BY TotalSold DESC;
 ```
+## DAY 13
