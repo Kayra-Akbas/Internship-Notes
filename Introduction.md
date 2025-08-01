@@ -2582,5 +2582,27 @@ ORDER BY TotalSold DESC;
 ## DAY 13 SQL with Chinhook
 ##  Top-Selling Track for Each Genre
 ```sql
+SELECT 
+    g.Name AS Genre,
+    t.Name AS TopTrack,
+    SUM(il.Quantity) AS TotalSold
+FROM Genre g
+JOIN Track t ON g.GenreId = t.GenreId
+JOIN InvoiceLine il ON t.TrackId = il.TrackId
+GROUP BY g.Name, t.Name
+HAVING SUM(il.Quantity) = (
+    SELECT MAX(SalesByTrack.Total)
+    FROM (
+        SELECT 
+            t2.GenreId,
+            t2.Name,
+            SUM(il2.Quantity) AS Total
+        FROM Track t2
+        JOIN InvoiceLine il2 ON t2.TrackId = il2.TrackId
+        GROUP BY t2.GenreId, t2.Name
+        HAVING t2.GenreId = g.GenreId
+    ) AS SalesByTrack
+)
+ORDER BY Genre;
 
 ```
