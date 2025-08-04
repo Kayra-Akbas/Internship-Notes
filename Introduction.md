@@ -2642,3 +2642,6 @@ GROUP BY al.Title, ar.Name
 ORDER BY GenreCount DESC;
 ```
 ##  Media Types with Average Track Duration Over 5 Minutes
+```sql
+
+```
