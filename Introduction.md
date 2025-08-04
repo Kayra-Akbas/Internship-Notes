@@ -2618,3 +2618,6 @@ WHERE t.Milliseconds > (
 ORDER BY LengthInMinutes DESC;
 ```
 ## Day 14 SQL practices with Chinhook
+```sql
+
+```
