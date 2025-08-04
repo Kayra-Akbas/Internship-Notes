@@ -2618,6 +2618,7 @@ WHERE t.Milliseconds > (
 ORDER BY LengthInMinutes DESC;
 ```
 ## Day 14 SQL practices with Chinhook
+## Total Sales by Country (Only Countries with Sales Over $50)
 ```sql
 
 ```
