@@ -2643,5 +2643,12 @@ ORDER BY GenreCount DESC;
 ```
 ##  Media Types with Average Track Duration Over 5 Minutes
 ```sql
-
+SELECT 
+    mt.Name AS MediaType,
+    ROUND(AVG(t.Milliseconds) / 60000.0, 2) AS AvgLengthMinutes
+FROM MediaType mt
+JOIN Track t ON mt.MediaTypeId = t.MediaTypeId
+GROUP BY mt.Name
+HAVING AVG(t.Milliseconds) > 5 * 60000
+ORDER BY AvgLengthMinutes DESC;
 ```
