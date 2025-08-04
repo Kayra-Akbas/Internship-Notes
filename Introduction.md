@@ -2629,3 +2629,7 @@ GROUP BY c.Country
 HAVING SUM(i.Total) > 50
 ORDER BY TotalRevenue DESC;
 ```
+##  Albums and Number of Different Genres in Them
+```sql
+
+```
