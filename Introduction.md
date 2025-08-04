@@ -2631,5 +2631,13 @@ ORDER BY TotalRevenue DESC;
 ```
 ##  Albums and Number of Different Genres in Them
 ```sql
-
+SELECT 
+    al.Title AS AlbumTitle,
+    ar.Name AS Artist,
+    COUNT(DISTINCT t.GenreId) AS GenreCount
+FROM Album al
+JOIN Artist ar ON al.ArtistId = ar.ArtistId
+JOIN Track t ON al.AlbumId = t.AlbumId
+GROUP BY al.Title, ar.Name
+ORDER BY GenreCount DESC;
 ```
