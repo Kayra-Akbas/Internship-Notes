@@ -2620,5 +2620,12 @@ ORDER BY LengthInMinutes DESC;
 ## Day 14 SQL practices with Chinhook
 ## Total Sales by Country (Only Countries with Sales Over $50)
 ```sql
-
+SELECT 
+    c.Country,
+    ROUND(SUM(i.Total), 2) AS TotalRevenue
+FROM Customer c
+JOIN Invoice i ON c.CustomerId = i.CustomerId
+GROUP BY c.Country
+HAVING SUM(i.Total) > 50
+ORDER BY TotalRevenue DESC;
 ```
