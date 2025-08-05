@@ -2674,3 +2674,4 @@ GROUP BY c.CustomerId, c.FirstName, c.LastName
 HAVING COUNT(DISTINCT i.InvoiceId) > 1
 ORDER BY NumberOfPurchases DESC;
 ```
+## Invoice Counts Per Year
