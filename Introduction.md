@@ -2683,4 +2683,4 @@ FROM Invoice
 GROUP BY YEAR(InvoiceDate)
 ORDER BY Year;
 ```
-##
+
