@@ -2653,3 +2653,6 @@ HAVING AVG(t.Milliseconds) > 5 * 60000
 ORDER BY AvgLengthMinutes DESC;
 ```
 ## DAY 15 SQL using Chinhook
+```sql
+
+```
