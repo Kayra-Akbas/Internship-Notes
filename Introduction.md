@@ -2659,14 +2659,18 @@ SELECT
     c.CustomerId,
     c.FirstName + ' ' + c.LastName AS CustomerName,
     COUNT(DISTINCT i.InvoiceId) AS NumberOfPurchases,
-    STRING_AGG(DISTINCT g.Name, ', ') AS PurchasedGenres
+    STUFF((
+        SELECT DISTINCT ', ' + g2.Name
+        FROM Invoice i2
+        JOIN InvoiceLine il2 ON i2.InvoiceId = il2.InvoiceId
+        JOIN Track t2 ON il2.TrackId = t2.TrackId
+        JOIN Genre g2 ON t2.GenreId = g2.GenreId
+        WHERE i2.CustomerId = c.CustomerId
+        FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, ''
+    ) AS PurchasedGenres
 FROM Customer c
 JOIN Invoice i ON c.CustomerId = i.CustomerId
-JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
-JOIN Track t ON il.TrackId = t.TrackId
-JOIN Genre g ON t.GenreId = g.GenreId
 GROUP BY c.CustomerId, c.FirstName, c.LastName
 HAVING COUNT(DISTINCT i.InvoiceId) > 1
 ORDER BY NumberOfPurchases DESC;
-
 ```
