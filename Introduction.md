@@ -2675,10 +2675,11 @@ HAVING COUNT(DISTINCT i.InvoiceId) > 1
 ORDER BY NumberOfPurchases DESC;
 ```
 ## Invoice Counts Per Year
-
+```sql
 SELECT 
     YEAR(InvoiceDate) AS Year,
     COUNT(*) AS InvoiceCount
 FROM Invoice
 GROUP BY YEAR(InvoiceDate)
 ORDER BY Year;
+```
