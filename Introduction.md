@@ -2655,5 +2655,18 @@ ORDER BY AvgLengthMinutes DESC;
 ## DAY 15 SQL using Chinhook
 ## Repeat Customers + Their Purchased Genres
 ```sql
+SELECT 
+    c.CustomerId,
+    c.FirstName + ' ' + c.LastName AS CustomerName,
+    COUNT(DISTINCT i.InvoiceId) AS NumberOfPurchases,
+    STRING_AGG(DISTINCT g.Name, ', ') AS PurchasedGenres
+FROM Customer c
+JOIN Invoice i ON c.CustomerId = i.CustomerId
+JOIN InvoiceLine il ON i.InvoiceId = il.InvoiceId
+JOIN Track t ON il.TrackId = t.TrackId
+JOIN Genre g ON t.GenreId = g.GenreId
+GROUP BY c.CustomerId, c.FirstName, c.LastName
+HAVING COUNT(DISTINCT i.InvoiceId) > 1
+ORDER BY NumberOfPurchases DESC;
 
 ```
